@@ -131,7 +131,7 @@ public class SwiftAdd2CalendarPlugin: NSObject, FlutterPlugin {
                 self.presentEventCalendarDetailModal(event: event, eventStore: eventStore)
             }
             completion?(true)
-        case .readOnly:
+        case .writeOnly:
             eventStore.requestAccess(to: .event, completion: { [weak self] (granted, error) in
                 if granted {
                     OperationQueue.main.addOperation {
