@@ -126,6 +126,23 @@ public class SwiftAdd2CalendarPlugin: NSObject, FlutterPlugin {
         case .denied, .restricted:
             // Auth denied or restricted
             completion?(false)
+        case .fullAccess:
+            OperationQueue.main.addOperation {
+                self.presentEventCalendarDetailModal(event: event, eventStore: eventStore)
+            }
+            completion?(true)
+        case .readOnly:
+            eventStore.requestAccess(to: .event, completion: { [weak self] (granted, error) in
+                if granted {
+                    OperationQueue.main.addOperation {
+                        self?.presentEventCalendarDetailModal(event: event, eventStore: eventStore)
+                    }
+                    completion?(true)
+                } else {
+                    // Auth denied
+                    completion?(false)
+                }
+            })
         }
     }
     
