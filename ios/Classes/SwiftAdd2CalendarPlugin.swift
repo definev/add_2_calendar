@@ -102,7 +102,7 @@ public class SwiftAdd2CalendarPlugin: NSObject, FlutterPlugin {
 	// Show event kit ui to add event to calendar
 	
 	func presentCalendarModalToAddEvent(_ event: EKEvent, eventStore: EKEventStore, completion: ((_ success: Bool) -> Void)? = nil) {
-#
+
 		if #available(iOS 17, *) {
 			let authStatus = getAuthorizationStatus()
 			switch authStatus {
@@ -171,6 +171,8 @@ public class SwiftAdd2CalendarPlugin: NSObject, FlutterPlugin {
 				})
 			case .denied, .restricted:
 				// Auth denied or restricted
+				completion?(false)
+			default:
 				completion?(false)
 			}
 		}		
