@@ -102,79 +102,33 @@ public class SwiftAdd2CalendarPlugin: NSObject, FlutterPlugin {
 	// Show event kit ui to add event to calendar
 	
 	func presentCalendarModalToAddEvent(_ event: EKEvent, eventStore: EKEventStore, completion: ((_ success: Bool) -> Void)? = nil) {
-
-		if #available(iOS 17, *) {
-			let authStatus = getAuthorizationStatus()
-			switch authStatus {
-			case .authorized:
-				OperationQueue.main.addOperation {
-					self.presentEventCalendarDetailModal(event: event, eventStore: eventStore)
-				}
-				completion?(true)
-			case .notDetermined:
-				//Auth is not determined
-				//We should request access to the calendar
-				eventStore.requestAccess(to: .event, completion: { [weak self] (granted, error) in
-					if granted {
-						OperationQueue.main.addOperation {
-							self?.presentEventCalendarDetailModal(event: event, eventStore: eventStore)
-						}
-						completion?(true)
-					} else {
-						// Auth denied
-						completion?(false)
-					}
-				})
-			case .denied, .restricted:
-				// Auth denied or restricted
-				completion?(false)
-				
-			case .fullAccess:
-				OperationQueue.main.addOperation {
-					self.presentEventCalendarDetailModal(event: event, eventStore: eventStore)
-				}
-				completion?(true)
-			case .writeOnly:
-				eventStore.requestAccess(to: .event, completion: { [weak self] (granted, error) in
-					if granted {
-						OperationQueue.main.addOperation {
-							self?.presentEventCalendarDetailModal(event: event, eventStore: eventStore)
-						}
-						completion?(true)
-					} else {
-						// Auth denied
-						completion?(false)
-					}
-				})
+		let authStatus = getAuthorizationStatus()
+		switch authStatus {
+		case .authorized:
+			OperationQueue.main.addOperation {
+				self.presentEventCalendarDetailModal(event: event, eventStore: eventStore)
 			}
-		} else {
-			let authStatus = getAuthorizationStatus()
-			switch authStatus {
-			case .authorized:
-				OperationQueue.main.addOperation {
-					self.presentEventCalendarDetailModal(event: event, eventStore: eventStore)
-				}
-				completion?(true)
-			case .notDetermined:
-				//Auth is not determined
-				//We should request access to the calendar
-				eventStore.requestAccess(to: .event, completion: { [weak self] (granted, error) in
-					if granted {
-						OperationQueue.main.addOperation {
-							self?.presentEventCalendarDetailModal(event: event, eventStore: eventStore)
-						}
-						completion?(true)
-					} else {
-						// Auth denied
-						completion?(false)
+			completion?(true)
+		case .notDetermined:
+			//Auth is not determined
+			//We should request access to the calendar
+			eventStore.requestAccess(to: .event, completion: { [weak self] (granted, error) in
+				if granted {
+					OperationQueue.main.addOperation {
+						self?.presentEventCalendarDetailModal(event: event, eventStore: eventStore)
 					}
-				})
-			case .denied, .restricted:
-				// Auth denied or restricted
-				completion?(false)
-			default:
-				completion?(false)
-			}
+					completion?(true)
+				} else {
+					// Auth denied
+					completion?(false)
+				}
+			})
+		case .denied, .restricted:
+			// Auth denied or restricted
+			completion?(false)
+			
+		default:
+			completion?(true)
 		}		
 	}
 	
